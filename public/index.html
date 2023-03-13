@@ -1,13 +1,17 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jueguito</title>
-</head>
-<body>
-    <h1>Hello World!!!!</h1>
-    
-</body>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Inicio de sesión</title>
+  </head>
+  <body>
+    <h1>Ingrese su nombre</h1>
+    <form id="login-form">
+      <input type="text" name="name" placeholder="Nombre" required />
+      <button type="submit">Ingresar</button>
+    </form>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="main.js"></script>
+  </body>
 </html>
