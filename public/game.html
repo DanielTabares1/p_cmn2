@@ -1,0 +1,74 @@
+<!-- game.html -->
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Juego de adivina quién</title>
+    <script src="/socket.io/socket.io.js"></script>
+</head>
+
+<body>
+    <h1>¡Bienvenido al juego!</h1>
+    <hr>
+
+    <div>
+        <form id="character-form">
+            <label for="character-select">Selecciona tu personaje:</label>
+            <select id="character-select" name="character">
+                <option value="1">Personaje 1</option>
+                <option value="2">Personaje 2</option>
+                <option value="3">Personaje 3</option>
+            </select>
+            <button id="select-character" type="submit">Seleccionar</button>
+        </form>
+    </div>
+
+    <script>
+        const socket = io();
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const nombre = urlParams.get('nombre');
+
+        const characterForm = document.getElementById('character-form');
+        const characterSelect = document.getElementById('character-select');
+        let hasSelectedCharacter = false;
+
+
+        // characterForm.addEventListener('submit', (event) => {
+        //     event.preventDefault();
+        //     const character = characterSelect.value;
+        //     socket.emit('select-character', character);
+        //     console.log('Personaje seleccionado: ' + character);
+        // });
+
+        const selectCharacterBtn = document.querySelector('#select-character');
+        selectCharacterBtn.addEventListener('click', () => {
+            if (!hasSelectedCharacter) {
+                // Emitir el evento "select-character" al servidor
+                const character = characterSelect.value;
+                const playerName = nombre;
+                const player = {
+                    character,
+                    playerName
+                };
+                socket.emit('select-character', player);
+                // Bloquear el botón de selección de personaje
+                selectCharacterBtn.disabled = true;
+                hasSelectedCharacter = true;
+            }
+        });
+
+        socket.on('game-start', ({ player }) => {
+            console.log(`El juego ha comenzado, eres el jugador ${player}`);
+        });
+
+        socket.on('redirect', (url) => {
+            window.location.href = url;
+        });
+
+    </script>
+
+</body>
+
+</html>
