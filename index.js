@@ -88,7 +88,7 @@ io.on("connection", (socket) => {
 });
 
 const port = process.env.PORT || 3000;
-server.listen(port, () => {
+server.listen(port, '0.0.0.0', () => {
     console.log(`Servidor iniciado en el puerto ${port}`);
 });
 

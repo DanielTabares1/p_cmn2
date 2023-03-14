@@ -1,0 +1,121 @@
+:root {
+    --blue: #00ADB5;
+    --dark: #222831;
+    --grey: #393E46;
+    --light: #EEEEEE;
+    --red: #FA58B6;
+}
+
+body {
+    background-color: var(--dark);
+    margin: 0;
+}
+
+.imagenes {
+    background-color: var(--grey);
+    margin-top: 5%;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    flex-wrap: wrap;
+    width: 65%;
+    height: 65%;
+    padding: 1rem;
+    margin-left: 6%;
+    border-radius: 2rem;    
+}
+
+.cuadro-personaje { 
+    height: 12rem;
+    width: 10rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-direction: column;
+    padding: 1rem 0.5rem;
+    border: 4px solid var(--dark);
+    background-color: var(--light);
+    border-radius: 1rem;
+    margin: 0.5rem;
+}
+
+.img-personaje {
+    width: 90%;    
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    border-radius: 1rem;
+    border: 4px solid var(--dark);
+}
+
+.btn-personaje {
+    width: 100%;
+    height: 17%;    
+    background-color: var(--blue);
+    color: var(--dark);
+    border-radius: 1rem;
+}
+
+.jugadores {
+    padding: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.jugador {
+    width: 25rem;
+    height: 5rem;    
+}
+
+.jugador1 {
+    background-color: var(--blue);   
+    border-radius: 0 0 1rem 0;
+}
+
+.jugador2 {
+    background-color: var(--red); 
+    border-radius: 0 0 0 1rem;   
+}
+
+.jugador h4 {
+    color: #fff;
+    font-size: 1.5rem;
+    margin: 0;
+    padding: 0;
+    padding-left: 1rem;
+    line-height: 3rem;
+}
+
+.juego {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;    
+}
+
+.preguntas {
+    background-color: var(--grey);
+    margin-top: 5%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start ;
+    align-items: center;
+    flex-wrap: wrap;
+    width: 20%;
+    height: 100%;
+    padding: 1rem;
+    border-radius: 2rem;     
+}
+
+.pregunta {
+    background-color: var(--light);
+    width: 86%;
+    border-radius: 1rem;
+    margin: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+    padding: 1rem;
+}

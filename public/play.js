@@ -27,4 +27,21 @@ const character_list = [
     { name: 'Betty', hair_style: 'long', hair_color: 'black', eye_color: 'blue', hat: true, shirt: 'yellow', skin: 'dark'},
 ];
 
+character_list.forEach(character => {
+    let nombre = character.name;
+    let imagen = nombre + '.png';
+
+    let contenedor = document.getElementById('cuadro-personajes');
+
+    contenedor.appendChild(document.createElement('div')).innerHTML = `
+        <div class="cuadro-personaje">
+            <img src="images/${imagen}" alt="${nombre}" class="img-personaje">
+            <button class="btn-personaje" onclick="seleccionarPersonaje('${nombre}')">Seleccionar</button>
+        </div>
+    `;   
+
+});
+
+
+
 
