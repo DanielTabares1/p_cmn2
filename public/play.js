@@ -1,12 +1,23 @@
+const socket = io();
+console.log("Socket: ", socket);
+
 const urlParams = new URLSearchParams(window.location.search);
 const player1 = urlParams.get('player1');
 const player2 = urlParams.get('player2');
 const player1Nombre = urlParams.get('player1Nombre');
 const player2Nombre = urlParams.get('player2Nombre');
+let turno = urlParams.get('turno') == 'true' ? true : false;
+let aux = turno ? 1 : 2;
 
 document.getElementById('player1-name').innerText = player1Nombre;
 document.getElementById('player2-name').innerText = player2Nombre;
 
+let vista_preguntas = document.getElementById('cuadro-preguntas');
+
+//quiero que se bloquee pero siga siendo visible
+if(!turno) {
+    vista_preguntas.classList = 'preguntas-false';   
+}
 
 const character_list = [
     { name: 'John', hair_style: 'short', hair_color: 'brown', eye_color: 'blue', hat: false, shirt: 'red', skin: 'light' },
@@ -54,28 +65,62 @@ question_list.forEach(pregunta => {
     let contenedor = document.getElementById('cuadro-preguntas');
     let atributo = pregunta.atributo;
     contenedor.appendChild(document.createElement('div')).innerHTML = `
-        <h4 class="pregunta" onclick="alert(resolverAtributo('${atributo}'))">${pregunta.pregunta}</h4>
+        <h4 class="pregunta" onclick="resolverAtributo('${atributo}');">${pregunta.pregunta}</h4>
     `;
 });
 
-function resolverAtributo(atributo) {
-    let personaje = character_list.find(x => x.name == player1)
-    respuesta = personaje[atributo]
-    return(respuesta)
+function resolverAtributo(atributo) {    
+    let playerAux = aux == 1 ? player2 : player1;
+    let personaje = character_list.find(x => x.name == playerAux)
+    respuesta = personaje[atributo]     
+    alert(respuesta)   
+    actualizar() 
 }
 
 // Todo ---  Modificar el método para que verifique con el socket si adivinó el personaje contrario
 function seleccionarPersonaje(nombre){
-    if(nombre = player1) {
+    console.log('Adivinando personaje...')
+    let playerAux = aux == 1 ? player2 : player1;
+    if(nombre == playerAux) {
         win()
     }
-    else cambiarTurno()
+    actualizar()
 }
 
 function cambiarTurno() {
-
+    turno = !turno;    
+    //window.location = `play.html?player1=${player1}&player2=${player2}&player1Nombre=${player1Nombre}&player2Nombre=${player2Nombre}&turno=${turno}`;
 }
 
+function actualizar() {
+    // cambiarTurno();
+    // if(turno) {
+    //     vista_preguntas.classList = 'preguntas';
+    // } else {
+    //     vista_preguntas.classList = 'preguntas-false';
+    // }
+    socket.emit('actualizar', !turno);
+    console.log('actualizar');
+}
 
+socket.on('actualizar-nuevo-turno', ( turno_p ) => {
+    console.log('actualizar-nuevo-turno');
+    if(turno) {
+        turno = false;
+        vista_preguntas.classList = 'preguntas-false';
+    } else {
+        turno = true;
+        vista_preguntas.classList = 'preguntas';
+    }
+});
 
+function win() {
+    let playerAux = aux == 1 ? player1Nombre : player2Nombre;
+    socket.emit('win', playerAux);
+}
+
+socket.on('game-over', ( ganador ) => {
+    alert('Ganó ' + ganador);
+    window.location.href = `/`;
+});
 

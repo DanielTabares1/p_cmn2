@@ -1,4 +1,9 @@
 // index.js
+
+fetch('https://api.ipify.org/').then(
+    r => r.text()
+).then(console.log);
+
 const { Console } = require("console");
 const express = require("express");
 const http = require("http");
@@ -14,7 +19,20 @@ let player2Character;
 let player1Id = null;
 let player2Id = null;
 
-let numPlayersReady = 0;
+let playerNames = [];
+let playerCharactersName = []
+let turnIndex = 0;
+
+function getNextTurnIndex() {
+    return (turnIndex + 1) % playerNames.length;
+}
+function isGameOver() {
+    return playerNames.length === 1;
+}
+
+function getWinnerIndex() {
+    return playerNames.length === 1 ? 0 : null;
+}
 
 app.use(express.static(__dirname + "/public"));
 
@@ -22,8 +40,8 @@ io.on("connection", (socket) => {
     console.log("Nuevo jugador conectado");
 
     socket.on("login", (name) => {
-        console.log(`El jugador ${name} se ha conectado`);
-
+        console.log(`El jugador ${socket.id} se ha conectado`);
+        
         // Redirigir a la página del juego
         socket.emit("redirect", "/game?nombre=" + name);
     });
@@ -33,28 +51,36 @@ io.on("connection", (socket) => {
             player1Id = socket.id;
             player1Character = player.character;
             player1Nombre = player.playerName;
+            
+            playerNames.push(player1Nombre);
+            playerCharactersName.push(player1Character);
+
             console.log(`Player 1 (${player1Id}) connected with character ${player.character}`);
         } else {
             // Si hay un jugador 1, asignar este socket como jugador 2
             player2Id = socket.id;
             player2Character = player.character;
             player2Nombre = player.playerName;
+
+            playerCharactersName.push(player2Character);
+            playerNames.push(player2Nombre);
+
             console.log(`Player 2 (${player2Id}) connected with character ${player.character}`);
 
             // Notificar a ambos jugadores que la partida ha comenzado
         }
 
-        numPlayersReady++;
-
-        if (numPlayersReady === 2) {
+        if (playerNames.length == 2) {
             // Emitir el evento "game-start" a ambos jugadores
-            io.to(player1Id).emit('game-start', { player: 1 });
-            io.to(player2Id).emit('game-start', { player: 2 });
+            io.to(player1Id).emit('game-start',  1 );
+            io.to(player2Id).emit('game-start',  2 );
             // Redirigir a ambos jugadores a la página "play.html"
-            io.to(player1Id).emit('redirect', '/play.html?player1=' + player1Character + '&player2=' + player2Character + '&player1Nombre=' + player1Nombre + '&player2Nombre=' + player2Nombre);
-            io.to(player2Id).emit('redirect', '/play.html?player1=' + player1Character + '&player2=' + player2Character + '&player1Nombre=' + player1Nombre + '&player2Nombre=' + player2Nombre);
-
+            let url = '/play.html?player1=' + player1Character + '&player2=' + player2Character + '&player1Nombre=' + player1Nombre + '&player2Nombre=' + player2Nombre
+            io.to(player1Id).emit('redirect', url + '&turno=true');
+            io.to(player2Id).emit('redirect', url + '&turno=false');
         }
+
+        
 
         // if (player1Character && player2Character) {
         //     console.log('Iniciando juego...')
@@ -79,12 +105,33 @@ io.on("connection", (socket) => {
         //         io.to(player1Id).emit('game-end', { winner: 1 });
         //     }
         // });
-
-
-
-
-
     });
+
+    socket.on('turn', (turnNumber) => {
+        const playerIndex = turnIndex;
+        socket.emit('turn', playerIndex, turnNumber);
+        socket.broadcast.emit('turn', playerIndex, turnNumber);
+        turnIndex = getNextTurnIndex();
+        
+        if (isGameOver()) {
+            const winnerIndex = getWinnerIndex();
+            socket.emit('game over', winnerIndex);
+            socket.broadcast.emit('game over', winnerIndex);
+            playerNames = [];
+            turnIndex = 0;
+        }
+    });
+
+    socket.on('actualizar', (turno) => {
+        console.log('Actualizando turno...');
+        io.emit('actualizar-nuevo-turno', turno);
+    });
+
+    socket.on('win', (winnner) => {
+        player1Id = null;
+        playerNames = [];
+        io.emit('game-over', winnner);
+    })
 });
 
 const port = process.env.PORT || 3000;
@@ -104,3 +151,6 @@ app.get('/play', (req, res) => {
     console.log('Player 1: ' + player1Character);
     console.log('Player 2: ' + player2Character);
 });
+
+
+

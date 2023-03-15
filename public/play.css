@@ -94,7 +94,7 @@ body {
     align-items: center;    
 }
 
-.preguntas {
+.preguntas {    
     background-color: var(--grey);
     margin-top: 5%;
     display: flex;
@@ -106,6 +106,22 @@ body {
     height: 100%;
     padding: 1rem;
     border-radius: 2rem;     
+}
+
+.preguntas-false{
+    opacity: 0.3;
+    pointer-events: none;
+    background-color: var(--red);
+    margin-top: 5%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start ;
+    align-items: center;
+    flex-wrap: wrap;
+    width: 20%;
+    height: 100%;
+    padding: 1rem;
+    border-radius: 2rem;   
 }
 
 .pregunta {
