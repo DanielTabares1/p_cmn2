@@ -1,9 +1,5 @@
 // index.js
 
-fetch('https://api.ipify.org/').then(
-    r => r.text()
-).then(console.log);
-
 const { Console } = require("console");
 const express = require("express");
 const http = require("http");
@@ -22,17 +18,6 @@ let player2Id = null;
 let playerNames = [];
 let playerCharactersName = []
 let turnIndex = 0;
-
-function getNextTurnIndex() {
-    return (turnIndex + 1) % playerNames.length;
-}
-function isGameOver() {
-    return playerNames.length === 1;
-}
-
-function getWinnerIndex() {
-    return playerNames.length === 1 ? 0 : null;
-}
 
 app.use(express.static(__dirname + "/public"));
 
@@ -66,70 +51,25 @@ io.on("connection", (socket) => {
             playerNames.push(player2Nombre);
 
             console.log(`Player 2 (${player2Id}) connected with character ${player.character}`);
-
+            
             // Notificar a ambos jugadores que la partida ha comenzado
         }
 
-        if (playerNames.length == 2) {
-            // Emitir el evento "game-start" a ambos jugadores
-            io.to(player1Id).emit('game-start',  1 );
-            io.to(player2Id).emit('game-start',  2 );
+        if (playerNames.length == 2) {            
             // Redirigir a ambos jugadores a la página "play.html"
             let url = '/play.html?player1=' + player1Character + '&player2=' + player2Character + '&player1Nombre=' + player1Nombre + '&player2Nombre=' + player2Nombre
             io.to(player1Id).emit('redirect', url + '&turno=true');
             io.to(player2Id).emit('redirect', url + '&turno=false');
-        }
-
-        
-
-        // if (player1Character && player2Character) {
-        //     console.log('Iniciando juego...')
-        //     const url = '/play?player1=' + player1Character + '&player2=' + player2Character;
-        //     window.location.replace(url);
-        // }
-
-
-        // socket.on('disconnect', () => {
-        //     console.log(`Socket ${socket.id} disconnected`);
-
-        //     // Si el jugador 1 se desconecta, reiniciar la partida
-        //     if (socket.id === player1Id) {
-        //         console.log('Player 1 disconnected');
-        //         player1Id = null;
-        //         player2Id = null;
-        //         io.emit('game-reset');
-        //     }
-        //     // Si el jugador 2 se desconecta, notificar al jugador 1 que ha ganado
-        //     else if (socket.id === player2Id) {
-        //         console.log('Player 2 disconnected');
-        //         io.to(player1Id).emit('game-end', { winner: 1 });
-        //     }
-        // });
-    });
-
-    socket.on('turn', (turnNumber) => {
-        const playerIndex = turnIndex;
-        socket.emit('turn', playerIndex, turnNumber);
-        socket.broadcast.emit('turn', playerIndex, turnNumber);
-        turnIndex = getNextTurnIndex();
-        
-        if (isGameOver()) {
-            const winnerIndex = getWinnerIndex();
-            socket.emit('game over', winnerIndex);
-            socket.broadcast.emit('game over', winnerIndex);
+            player1Id = null;
             playerNames = [];
-            turnIndex = 0;
         }
-    });
+    });    
 
     socket.on('actualizar', (turno) => {
-        console.log('Actualizando turno...');
         io.emit('actualizar-nuevo-turno', turno);
     });
 
-    socket.on('win', (winnner) => {
-        player1Id = null;
-        playerNames = [];
+    socket.on('win', (winnner) => { 
         io.emit('game-over', winnner);
     })
 });
@@ -142,15 +82,3 @@ server.listen(port, '0.0.0.0', () => {
 app.get('/game', (req, res) => {
     res.sendFile(__dirname + '/public/game.html');
 });
-
-// Creo que esto no es necesario, pero lo dejo por si acaso 
-app.get('/play', (req, res) => {
-    const player1Character = req.query.player1;
-    const player2Character = req.query.player2;
-    res.render('play', { player1Character, player2Character });
-    console.log('Player 1: ' + player1Character);
-    console.log('Player 2: ' + player2Character);
-});
-
-
-

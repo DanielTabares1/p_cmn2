@@ -1,74 +1,77 @@
 <!-- game.html -->
 <!DOCTYPE html>
 <html>
-
 <head>
     <meta charset="UTF-8" />
     <title>Juego de adivina quién</title>
     <script src="/socket.io/socket.io.js"></script>
+    <link rel="stylesheet" href="play.css" />
 </head>
 
-<body>
+<body style="background-color: #eee">
     <h1>¡Bienvenido al juego!</h1>
-    <hr>
-
+    <hr />
     <div>
         <form id="character-form">
             <label for="character-select">Selecciona tu personaje:</label>
-            <select id="character-select" name="character">
-                <option value="Bill">Bill</option>
-                <option value="Sue">Sue</option>
-                <option value="Betty">Betty</option>
-            </select>
+            <select id="character-select" name="character"></select>
             <button id="select-character" type="submit">Seleccionar</button>
         </form>
+        <h4>Lista de Personajes:</h4>
+        <div
+            class="imagenes"
+            id="cuadro-personajes"
+            style="margin-top: 0"
+        ></div>
     </div>
 
     <script>
         const socket = io();
 
         const urlParams = new URLSearchParams(window.location.search);
-        const nombre = urlParams.get('nombre');
+        const nombre = urlParams.get("nombre");
 
-        const characterForm = document.getElementById('character-form');
-        const characterSelect = document.getElementById('character-select');
+        const characterForm = document.getElementById("character-form");
+        const characterSelect = document.getElementById("character-select");
+        const img = document.getElementById("imagen");
+        const imagenes = document.getElementById("cuadro-personajes");
+
         let hasSelectedCharacter = false;
 
+        const character_list = ["John","Mary","Jack","Sally","Bob","Sue","Joe",
+        "Jane","Bill","Sarah","Tom","Alice","Steve","Linda","Harry","Betty",];
 
-        // characterForm.addEventListener('submit', (event) => {
-        //     event.preventDefault();
-        //     const character = characterSelect.value;
-        //     socket.emit('select-character', character);
-        //     console.log('Personaje seleccionado: ' + character);
-        // });
+        character_list.forEach((element) => {
+            characterSelect.innerHTML += `<option value="${element}">${element}</option>`;
 
-        const selectCharacterBtn = document.querySelector('#select-character');
-        selectCharacterBtn.addEventListener('click', () => {
+            imagenes.appendChild(document.createElement("div")).innerHTML = `
+                <div class="cuadro-personaje">
+                    <img src="images/${element}.png" alt="${element}" class="img-personaje">
+                    <h4>${element}</h4>
+                </div>
+            `;
+        });
+
+        const selectCharacterBtn = document.querySelector("#select-character");
+        selectCharacterBtn.addEventListener("click", () => {
             if (!hasSelectedCharacter) {
                 // Emitir el evento "select-character" al servidor
                 const character = characterSelect.value;
                 const playerName = nombre;
                 const player = {
                     character,
-                    playerName
+                    playerName,
                 };
-                socket.emit('select-character', player);
+                socket.emit("select-character", player);
                 // Bloquear el botón de selección de personaje
                 selectCharacterBtn.disabled = true;
                 hasSelectedCharacter = true;
             }
         });
 
-        socket.on('game-start', ( player ) => {
-            console.log(`El juego ha comenzado, eres el jugador ${player}`);
-        });
-
-        socket.on('redirect', (url) => {
+        socket.on("redirect", (url) => {
             window.location.href = url;
         });
-
     </script>
-
 </body>
-
 </html>

@@ -14,7 +14,6 @@ document.getElementById('player2-name').innerText = player2Nombre;
 
 let vista_preguntas = document.getElementById('cuadro-preguntas');
 
-//quiero que se bloquee pero siga siendo visible
 if(!turno) {
     vista_preguntas.classList = 'preguntas-false';   
 }
@@ -77,7 +76,6 @@ function resolverAtributo(atributo) {
     actualizar() 
 }
 
-// Todo ---  Modificar el método para que verifique con el socket si adivinó el personaje contrario
 function seleccionarPersonaje(nombre){
     console.log('Adivinando personaje...')
     let playerAux = aux == 1 ? player2 : player1;
@@ -89,16 +87,9 @@ function seleccionarPersonaje(nombre){
 
 function cambiarTurno() {
     turno = !turno;    
-    //window.location = `play.html?player1=${player1}&player2=${player2}&player1Nombre=${player1Nombre}&player2Nombre=${player2Nombre}&turno=${turno}`;
 }
 
-function actualizar() {
-    // cambiarTurno();
-    // if(turno) {
-    //     vista_preguntas.classList = 'preguntas';
-    // } else {
-    //     vista_preguntas.classList = 'preguntas-false';
-    // }
+function actualizar() {   
     socket.emit('actualizar', !turno);
     console.log('actualizar');
 }
